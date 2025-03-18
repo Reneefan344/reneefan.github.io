@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 决策支持平台</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+primary: '#4F46E5',
+secondary: '#10B981'
+},
+borderRadius: {
+'none': '0px',
+'sm': '4px',
+DEFAULT: '8px',
+'md': '12px',
+'lg': '16px',
+'xl': '20px',
+'2xl': '24px',
+'3xl': '32px',
+'full': '9999px',
+'button': '8px'
+}
+}
+}
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+.chart-container { width: 100%; height: 300px; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+</style>
+</head>
+<body class="bg-gray-50">
+<div class="flex h-screen">
+<aside class="w-64 bg-white shadow-lg fixed h-full">
+<div class="p-4 border-b">
+<h1 class="text-2xl font-['Pacifico'] text-primary">logo</h1>
+</div>
+<nav class="p-4">
+<div class="space-y-2">
+<a href="#" class="flex items-center p-2 text-gray-700 rounded hover:bg-gray-100 cursor-pointer">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-dashboard-line"></i>
+</div>
+<span class="ml-3">数据概览</span>
+</a>
+<a href="https://readdy.ai/home/f8476d51-195d-4330-ba14-ead214c22320/5a0aaf42-2322-4d23-880f-ad88b2f31271" data-readdy="true" class="flex items-center p-2 text-gray-700 rounded hover:bg-gray-100 cursor-pointer">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-line-chart-line"></i>
+</div>
+<span class="ml-3">实时分析</span>
+</a>
+<a href="https://readdy.ai/home/f8476d51-195d-4330-ba14-ead214c22320/813dd41e-cbba-4503-873c-b89a8d31399c" data-readdy="true" class="flex items-center p-2 text-gray-700 rounded hover:bg-gray-100 cursor-pointer">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-robot-line"></i>
+</div>
+<span class="ml-3">模型管理</span>
+</a>
+<a href="#" class="flex items-center p-2 text-gray-700 rounded hover:bg-gray-100 cursor-pointer">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-bar-chart-line"></i>
+</div>
+<span class="ml-3">绩效报告</span>
+</a>
+<a href="#" class="flex items-center p-2 text-gray-700 rounded hover:bg-gray-100 cursor-pointer">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-lightbulb-line"></i>
+</div>
+<span class="ml-3">优化建议</span>
+</a>
+<a href="#" class="flex items-center p-2 text-gray-700 rounded hover:bg-gray-100 cursor-pointer">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-store-line"></i>
+</div>
+<span class="ml-3">店铺管理</span>
+</a>
+</div>
+</nav>
+</aside>
+<div class="flex-1 ml-64">
+<header class="bg-white shadow-sm fixed w-full z-10 px-4">
+<div class="flex h-16 items-center justify-between">
+<div class="flex items-center flex-1">
+<div class="relative w-64">
+<input type="text" placeholder="搜索..." class="w-full pl-10 pr-4 py-2 rounded-lg border-none bg-gray-100 text-sm">
+<div class="absolute left-3 top-2.5 w-5 h-5 flex items-center justify-center text-gray-400">
+<i class="ri-search-line"></i>
+</div>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<button class="relative w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-100 cursor-pointer">
+<i class="ri-notification-3-line"></i>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+</button>
+<div class="flex items-center space-x-2 cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+<i class="ri-user-line text-gray-600"></i>
+</div>
+<span class="text-sm font-medium">陈经理</span>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-20 px-6 pb-8">
+<div class="grid grid-cols-4 gap-6 mb-8">
+<div class="bg-white p-6 rounded-lg shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-sm text-gray-500">今日营业额</p>
+<h3 class="text-2xl font-semibold mt-1">¥286,432</h3>
+</div>
+<span class="text-green-500 text-sm">+12.5%</span>
+</div>
+<div id="revenue-chart" class="h-12"></div>
+</div>
+<div class="bg-white p-6 rounded-lg shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-sm text-gray-500">今日客流量</p>
+<h3 class="text-2xl font-semibold mt-1">12,847</h3>
+</div>
+<span class="text-green-500 text-sm">+8.3%</span>
+</div>
+<div id="traffic-chart" class="h-12"></div>
+</div>
+<div class="bg-white p-6 rounded-lg shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-sm text-gray-500">今日订单数</p>
+<h3 class="text-2xl font-semibold mt-1">3,624</h3>
+</div>
+<span class="text-red-500 text-sm">-2.1%</span>
+</div>
+<div id="orders-chart" class="h-12"></div>
+</div>
+<div class="bg-white p-6 rounded-lg shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-sm text-gray-500">会员总数</p>
+<h3 class="text-2xl font-semibold mt-1">156,729</h3>
+</div>
+<span class="text-green-500 text-sm">+5.8%</span>
+</div>
+<div id="members-chart" class="h-12"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-6 mb-8">
+<div class="bg-white p-6 rounded-lg shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-medium">销售趋势</h3>
+<div class="flex space-x-2">
+<button class="px-3 py-1 text-sm bg-gray-100 rounded-full hover:bg-gray-200 !rounded-button cursor-pointer">今日</button>
+<button class="px-3 py-1 text-sm bg-primary text-white rounded-full !rounded-button cursor-pointer">本周</button>
+<button class="px-3 py-1 text-sm bg-gray-100 rounded-full hover:bg-gray-200 !rounded-button cursor-pointer">本月</button>
+</div>
+</div>
+<div id="sales-trend" class="chart-container"></div>
+</div>
+<div class="bg-white p-6 rounded-lg shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-medium">热销品类</h3>
+<button class="text-primary text-sm cursor-pointer">查看更多</button>
+</div>
+<div id="category-sales" class="chart-container"></div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-6 mb-8">
+<div class="col-span-2 bg-white p-6 rounded-lg shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-medium">门店绩效</h3>
+<div class="flex space-x-2">
+<button class="flex items-center px-3 py-1 text-sm bg-gray-100 rounded-full hover:bg-gray-200 !rounded-button cursor-pointer">
+<i class="ri-download-line mr-1"></i>
+导出报告
+</button>
+</div>
+</div>
+<table class="w-full">
+<thead>
+<tr class="text-left text-sm text-gray-500">
+<th class="pb-4">门店名称</th>
+<th class="pb-4">今日营业额</th>
+<th class="pb-4">订单数</th>
+<th class="pb-4">客单价</th>
+<th class="pb-4">同比增长</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="border-t">
+<td class="py-4">上海南京东路店</td>
+<td>¥42,368</td>
+<td>386</td>
+<td>¥109.8</td>
+<td class="text-green-500">+15.2%</td>
+</tr>
+<tr class="border-t">
+<td class="py-4">北京王府井店</td>
+<td>¥38,925</td>
+<td>342</td>
+<td>¥113.8</td>
+<td class="text-green-500">+12.8%</td>
+</tr>
+<tr class="border-t">
+<td class="py-4">广州天河城店</td>
+<td>¥35,647</td>
+<td>298</td>
+<td>¥119.6</td>
+<td class="text-red-500">-2.4%</td>
+</tr>
+<tr class="border-t">
+<td class="py-4">深圳华强北店</td>
+<td>¥33,892</td>
+<td>276</td>
+<td>¥122.8</td>
+<td class="text-green-500">+8.6%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="bg-white p-6 rounded-lg shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-medium">AI 优化建议</h3>
+<div class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer">
+<i class="ri-refresh-line"></i>
+</div>
+</div>
+<div class="space-y-4">
+<div class="p-4 bg-blue-50 rounded-lg">
+<div class="flex justify-between items-start">
+<div class="w-8 h-8 flex items-center justify-center bg-blue-100 rounded-full text-blue-600">
+<i class="ri-timer-line"></i>
+</div>
+<span class="text-xs text-gray-500">5 分钟前</span>
+</div>
+<h4 class="font-medium mt-2">建议调整午市营业时间</h4>
+<p class="text-sm text-gray-600 mt-1">根据近期客流分析，建议将午市开始时间提前至 11:00，预计可提升营收 8.5%</p>
+</div>
+<div class="p-4 bg-green-50 rounded-lg">
+<div class="flex justify-between items-start">
+<div class="w-8 h-8 flex items-center justify-center bg-green-100 rounded-full text-green-600">
+<i class="ri-shopping-bag-line"></i>
+</div>
+<span class="text-xs text-gray-500">28 分钟前</span>
+</div>
+<h4 class="font-medium mt-2">新品推荐策略优化</h4>
+<p class="text-sm text-gray-600 mt-1">建议在晚市增加季节限定新品推广力度，预计可提升单店日均销售额 12.3%</p>
+</div>
+<div class="p-4 bg-yellow-50 rounded-lg">
+<div class="flex justify-between items-start">
+<div class="w-8 h-8 flex items-center justify-center bg-yellow-100 rounded-full text-yellow-600">
+<i class="ri-user-star-line"></i>
+</div>
+<span class="text-xs text-gray-500">2 小时前</span>
+</div>
+<h4 class="font-medium mt-2">会员活动建议</h4>
+<p class="text-sm text-gray-600 mt-1">本周五建议开展会员专享活动，预计可带动会员消费提升 15.6%</p>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white p-6 rounded-lg shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-medium">门店分布</h3>
+<div class="flex space-x-2">
+<select class="px-3 py-1 text-sm bg-gray-100 rounded-full cursor-pointer pr-8">
+<option>全部区域</option>
+<option>华东区</option>
+<option>华北区</option>
+<option>华南区</option>
+</select>
+<select class="px-3 py-1 text-sm bg-gray-100 rounded-full cursor-pointer pr-8">
+<option>全部业态</option>
+<option>商场店</option>
+<option>街铺店</option>
+<option>写字楼店</option>
+</select>
+</div>
+</div>
+<div class="w-full h-[400px] rounded-lg overflow-hidden">
+<img src="https://public.readdy.ai/gen_page/map_placeholder_1280x720.png" class="w-full h-full object-cover" alt="地图">
+</div>
+</div>
+</main>
+</div>
+</div>
+<script>
+const mockData = {
+revenue: Array.from({length: 7}, () => Math.floor(Math.random() * 50000) + 200000),
+traffic: Array.from({length: 7}, () => Math.floor(Math.random() * 5000) + 8000),
+orders: Array.from({length: 7}, () => Math.floor(Math.random() * 1000) + 2500),
+members: Array.from({length: 7}, () => Math.floor(Math.random() * 1000) + 155000),
+};
+function createMiniChart(elementId, data, color) {
+const chart = echarts.init(document.getElementById(elementId));
+const option = {
+animation: false,
+grid: {
+left: 0,
+right: 0,
+top: 0,
+bottom: 0
+},
+xAxis: {
+type: 'category',
+show: false
+},
+yAxis: {
+type: 'value',
+show: false
+},
+series: [{
+data: data,
+type: 'line',
+smooth: true,
+symbol: 'none',
+lineStyle: {
+color: color
+},
+areaStyle: {
+color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+offset: 0,
+color: color
+}, {
+offset: 1,
+color: '#fff'
+}])
+}
+}]
+};
+chart.setOption(option);
+}
+createMiniChart('revenue-chart', mockData.revenue, 'rgba(87, 181, 231, 1)');
+createMiniChart('traffic-chart', mockData.traffic, 'rgba(141, 211, 199, 1)');
+createMiniChart('orders-chart', mockData.orders, 'rgba(251, 191, 114, 1)');
+createMiniChart('members-chart', mockData.members, 'rgba(252, 141, 98, 1)');
+const salesTrendChart = echarts.init(document.getElementById('sales-trend'));
+const salesTrendOption = {
+animation: false,
+tooltip: {
+trigger: 'axis',
+backgroundColor: 'rgba(255, 255, 255, 0.9)',
+borderColor: '#eee',
+textStyle: {
+color: '#666'
+}
+},
+grid: {
+left: '3%',
+right: '4%',
+bottom: '3%',
+containLabel: true
+},
+xAxis: {
+type: 'category',
+boundaryGap: false,
+data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+axisLine: {
+lineStyle: {
+color: '#eee'
+}
+},
+axisLabel: {
+color: '#666'
+}
+},
+yAxis: {
+type: 'value',
+axisLine: {
+show: false
+},
+axisTick: {
+show: false
+},
+splitLine: {
+lineStyle: {
+color: '#eee'
+}
+},
+axisLabel: {
+color: '#666'
+}
+},
+series: [{
+name: '销售额',
+type: 'line',
+smooth: true,
+data: [120000, 132000, 101000, 134000, 90000, 230000, 210000],
+lineStyle: {
+color: 'rgba(87, 181, 231, 1)'
+},
+areaStyle: {
+color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+offset: 0,
+color: 'rgba(87, 181, 231, 0.3)'
+}, {
+offset: 1,
+color: 'rgba(87, 181, 231, 0.1)'
+}])
+},
+symbol: 'none'
+}]
+};
+salesTrendChart.setOption(salesTrendOption);
+const categorySalesChart = echarts.init(document.getElementById('category-sales'));
+const categorySalesOption = {
+animation: false,
+tooltip: {
+trigger: 'item',
+backgroundColor: 'rgba(255, 255, 255, 0.9)',
+borderColor: '#eee',
+textStyle: {
+color: '#666'
+}
+},
+series: [{
+name: '品类销售',
+type: 'pie',
+radius: ['40%', '70%'],
+avoidLabelOverlap: false,
+itemStyle: {
+borderRadius: 10,
+borderColor: '#fff',
+borderWidth: 2
+},
+label: {
+show: true,
+position: 'outside',
+formatter: '{b}: {d}%'
+},
+labelLine: {
+show: true
+},
+data: [
+{value: 1048, name: '主食', itemStyle: {color: 'rgba(87, 181, 231, 1)'}},
+{value: 735, name: '小吃', itemStyle: {color: 'rgba(141, 211, 199, 1)'}},
+{value: 580, name: '饮品', itemStyle: {color: 'rgba(251, 191, 114, 1)'}},
+{value: 484, name: '甜点', itemStyle: {color: 'rgba(252, 141, 98, 1)'}}
+]
+}]
+};
+categorySalesChart.setOption(categorySalesOption);
+window.addEventListener('resize', () => {
+salesTrendChart.resize();
+categorySalesChart.resize();
+});
+</script>
+</body>
+</html>
